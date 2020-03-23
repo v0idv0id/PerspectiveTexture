@@ -30,11 +30,11 @@ int main(int argc, char const *argv[])
     glEnable(GL_DEPTH);
     glEnable(GL_MULTISAMPLE);
     unsigned int texture[2];
-    load_texture("assets/uv1.png",&texture[0]);
+    load_texture("assets/uv1.png", &texture[0]);
     load_texture("assets/uv2.png", &texture[1]);
-    // load_texture("assets/uv1.png", &texture[1]);
 
     Shader quadShader("shaders/quad_vs.glsl", "shaders/quad_fs.glsl");
+    Shader pointShader("shaders/point_vs.glsl", "shaders/point_fs.glsl");
 
     memcpy(quadVertices, quadVertices_orig, sizeof(quadVertices));
     unsigned int quadVAO, quadVBO, quadEBO;
@@ -51,29 +51,47 @@ int main(int argc, char const *argv[])
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, quadEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(quadIndices), &quadIndices, GL_STATIC_DRAW);
 
-    glEnableVertexAttribArray(0);                                                  // coordinates
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)0); // coordinates
+    _id = 0;
+    glEnableVertexAttribArray(_id);                                                  // vertex coordinates layout(location = 0)
+    glVertexAttribPointer(_id, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)0); // vertex coordinates
 
-    glEnableVertexAttribArray(1);                                                                    //texture
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(3 * sizeof(float))); //texture
+    _id = 1;
+    glEnableVertexAttribArray(_id);                                                                    //texture coord,  layout(location = 1)
+    glVertexAttribPointer(_id, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(3 * sizeof(float))); //texture
+
+    _id = 2;
+    glEnableVertexAttribArray(_id);                                                                    //texture2 coord, layout(location = 2)
+    glVertexAttribPointer(_id, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(float), (void *)(6 * sizeof(float))); //texture2
 
     glBindVertexArray(0); // unbind
     nonAffine(quadVertices);
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        if (doanimation)
+        {
+            quadVertices[0] = sin(currentFrame) / 4. - 0.5;
+            quadVertices[1] = cos(currentFrame) / 4. - 0.5;
+            quadVertices[9] = sin(currentFrame * 0.2) / 4. + 0.5;
+            quadVertices[10] = cos(currentFrame * 0.9) / 4. - 0.5;
+            quadVertices[18] = sin(currentFrame * 0.3) / 4. + 0.5;
+            quadVertices[19] = cos(currentFrame * 1.1) / 4. + 0.5;
+            quadVertices[27] = sin(currentFrame * 0.6) / 4. - 0.5;
+            quadVertices[28] = cos(currentFrame * 1.4) / 4. + 0.5;
+        }
         processGLFWInput(window);
+        nonAffine(quadVertices);
 
         glEnable(GL_DEPTH_TEST);
-        glClearColor(0.2f, 0.2f, 0.3f, 1.0f);
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glEnable(GL_MULTISAMPLE);
 
         glBindVertexArray(quadVAO);
 
         glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), &quadVertices, GL_STATIC_DRAW); // update the vertices data
-
-        nonAffine(quadVertices);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture[0]);
@@ -85,8 +103,10 @@ int main(int argc, char const *argv[])
         quadShader.setInt("texture0", 0);
         quadShader.setInt("texture1", 1);
         quadShader.setFloat("texmix", texmix);
-        glEnable(GL_PROGRAM_POINT_SIZE);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        pointShader.use();
+        glDrawElements(GL_POINTS, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -108,24 +128,24 @@ void processGLFWInput(GLFWwindow *window)
             quadVertices[1] = 1 - y / window_height * 2;
             activecorner = 0;
         }
-        if (inCircleN(x / window_width * 2 - 1, 1 - y / window_height * 2, 0.1, quadVertices[6], quadVertices[7]) || activecorner == 1)
+        if (inCircleN(x / window_width * 2 - 1, 1 - y / window_height * 2, 0.1, quadVertices[9], quadVertices[10]) || activecorner == 1)
         {
-            quadVertices[6] = x / window_width * 2 - 1;
-            quadVertices[7] = 1 - y / window_height * 2;
+            quadVertices[9] = x / window_width * 2 - 1;
+            quadVertices[10] = 1 - y / window_height * 2;
             activecorner = 1;
         }
 
-        if (inCircleN(x / window_width * 2 - 1, 1 - y / window_height * 2, 0.1, quadVertices[12], quadVertices[13]) || activecorner == 2)
-        {
-            quadVertices[12] = x / window_width * 2 - 1;
-            quadVertices[13] = 1 - y / window_height * 2;
-            activecorner = 2;
-        }
-
-        if (inCircleN(x / window_width * 2 - 1, 1 - y / window_height * 2, 0.1, quadVertices[18], quadVertices[19]) || activecorner == 3)
+        if (inCircleN(x / window_width * 2 - 1, 1 - y / window_height * 2, 0.1, quadVertices[18], quadVertices[19]) || activecorner == 2)
         {
             quadVertices[18] = x / window_width * 2 - 1;
             quadVertices[19] = 1 - y / window_height * 2;
+            activecorner = 2;
+        }
+
+        if (inCircleN(x / window_width * 2 - 1, 1 - y / window_height * 2, 0.1, quadVertices[27], quadVertices[28]) || activecorner == 3)
+        {
+            quadVertices[27] = x / window_width * 2 - 1;
+            quadVertices[28] = 1 - y / window_height * 2;
             activecorner = 3;
         }
     }
@@ -133,25 +153,30 @@ void processGLFWInput(GLFWwindow *window)
         activecorner = -1;
 
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_FALSE);
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
-    if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         memcpy(quadVertices, quadVertices_orig, sizeof(quadVertices_orig));
         nonAffine(quadVertices);
     }
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
         texmix += 0.01;
         if (texmix > 1.0)
             texmix = 1.0;
     }
 
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
         texmix -= 0.01;
         if (texmix < 0)
             texmix = 0.0;
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+    {
+        doanimation = !doanimation;
     }
 }
 
@@ -203,20 +228,20 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height)
     glViewport(0, 0, width, height);
 }
 
-void nonAffine(float *vertex)
+int nonAffine(float *vertex)
 {
 
-    float ax = vertex[12] - vertex[0];
-    float ay = vertex[13] - vertex[1];
-    float bx = vertex[18] - vertex[6];
-    float by = vertex[19] - vertex[7];
+    float ax = vertex[18] - vertex[0];
+    float ay = vertex[19] - vertex[1];
+    float bx = vertex[27] - vertex[9];
+    float by = vertex[28] - vertex[10];
 
     float cross = ax * by - ay * bx;
 
     if (cross != 0)
     {
-        float cy = vertex[1] - vertex[7];
-        float cx = vertex[0] - vertex[6];
+        float cy = vertex[1] - vertex[10];
+        float cx = vertex[0] - vertex[9];
         float s = (ax * cy - ay * cx) / cross;
         if (s > 0 && s < 1)
         {
@@ -237,30 +262,34 @@ void nonAffine(float *vertex)
                 vertex[4] = v2 * q0;
                 vertex[5] = q0;
 
-                vertex[9] = u2 * q1;
-                vertex[10] = v2 * q1;
-                vertex[11] = q1;
+                vertex[12] = u2 * q1;
+                vertex[13] = v2 * q1;
+                vertex[14] = q1;
 
-                vertex[15] = u2 * q2;
-                vertex[16] = v0 * q2;
-                vertex[17] = q2;
+                vertex[21] = u2 * q2;
+                vertex[22] = v0 * q2;
+                vertex[23] = q2;
 
-                vertex[21] = u0 * q3;
-                vertex[22] = v0 * q3;
-                vertex[23] = q3;
+                vertex[30] = u0 * q3;
+                vertex[31] = v0 * q3;
+                vertex[32] = q3;
             }
             else
             {
+                return 0;
                 std::cout << "T not in range:" << t << std::endl;
             }
         }
         else
         {
+            return 0;
             std::cout << "S not in range:" << s << std::endl;
         }
     }
     else
     {
+        return 0;
         std::cout << "CROSS is ZERO:" << cross << std::endl;
     }
+    return 1;
 }
