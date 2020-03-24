@@ -52,7 +52,8 @@ While the program is running you can control it with:
 ```
 
 ## Notes
-Calculating the UVQ in the main program is not really necessary nowerdays. 
+* Calculating the UVQ in the main program is not really necessary nowerdays - it should be done in the shader - this is part of the future development of this example.#
+* Most of the code is for handling the mouse events, keystrokes, loading textures, animation,... the real "magic" is just the ```nonAffine()``` function and using the new coordinates in the fragment shader.
 
 ## References
 * The main OpenGL concept is based on the examples from https://www.learnopengl.com
