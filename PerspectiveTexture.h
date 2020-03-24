@@ -23,46 +23,16 @@ void load_texture(const char *file, unsigned int *texture);
 float inline inCircleN(float x, float y, float r, float x0, float y0);
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 int nonAffine(float *vertex);
-
+void usage();
+unsigned int texture[2];
+int textures=0;
 float quadVertices[36];
 float quadVertices_orig[36] = {
     // positions 3D        // texCoords 3D      // texCoords 3D original
-    -1.0f,
-    -1.0f,
-    0.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    1.0f,
-    -1.0f,
-    0.0f,
-    1.0f,
-    0.0f,
-    1.0f,
-    1.0f,
-    0.0f,
-    1.0f,
-    1.0f,
-    1.0f,
-    0.0f,
-    1.0f,
-    1.0f,
-    1.0f,
-    1.0f,
-    1.0f,
-    1.0f,
-    -1.0f,
-    1.0f,
-    0.0f,
-    0.0f,
-    1.0f,
-    1.0f,
-    0.0f,
-    1.0f,
-    1.0f,
+    -1.0f, -1.0f, 0.0f,     0.0f, 0.0f, 1.0f,   0.0f, 0.0f, 1.0f,
+     1.0f, -1.0f, 0.0f,     1.0f, 0.0f, 1.0f,   1.0f, 0.0f, 1.0f,
+     1.0f,  1.0f, 0.0f,     1.0f, 1.0f, 1.0f,   1.0f, 1.0f, 1.0f,
+    -1.0f,  1.0f, 0.0f,     0.0f, 1.0f, 1.0f,   0.0f, 1.0f, 1.0f,
 };
 
 unsigned int quadIndices[] = {
