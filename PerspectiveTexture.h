@@ -11,13 +11,11 @@
 #include <stb_image.h>
 
 #include <shader.h>
-#include <camera.h>
 
 int window_width = 800;
 int window_height = 600;
 
 GLFWwindow *window = NULL;
-Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
 void processGLFWInput(GLFWwindow *window);
 void load_texture(const char *file, unsigned int *texture);
 float inline inCircleN(float x, float y, float r, float x0, float y0);
@@ -40,6 +38,6 @@ unsigned int quadIndices[] = {
 
 float texmix = 0.5;
 int activecorner = -1;
-int _id;
+int _id=0;
 int doanimation = 0;
 #endif
