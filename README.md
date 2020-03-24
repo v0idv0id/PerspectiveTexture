@@ -5,6 +5,10 @@ The render pipeline uses modern OpenGL and shaders.
 
 In the assets folder you will find the textures, screenshots of the two ways to render and a screen capture video that shows the program in action.
 
+Click the image below to see the screen capture vide of the program on youtube:
+
+[![Perspective Texture on a quad using non-Affine rendering](http://img.youtube.com/vi/ICWvt6AYo-U/0.jpg)](https://www.youtube.com/watch?v=ICWvt6AYo-U "Perspective Texture on a quad using non-Affine rendering")
+
 ## How it works
 The problem with quads and linear UV interpolation is that it only arbitrary affine transforms are allowed as long as quad stays a parallelogram. To solve this problem projective interpolation is needed (UVQ). 
 
